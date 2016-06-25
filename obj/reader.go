@@ -33,7 +33,7 @@ func (r *stdReader) Read() (*Object, error) {
 			return nil, err
 		}
 
-		if err := r.readLine(line, &o); err != nil {
+		if err := r.readLine(line[0:len(line)-1], &o); err != nil {
 			return nil, err
 		}
 	}
@@ -47,7 +47,7 @@ func (r *stdReader) readLine(line []byte, o *Object) error {
 		return nil
 	}
 
-	tokens := splitByToken(line[0:len(line)-1], ' ')
+	tokens := splitByToken(line, ' ')
 	rest := tokens[1:]
 
 	switch string(tokens[0]) {

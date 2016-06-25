@@ -25,13 +25,54 @@ func TestReadBleh(t *testing.T) {
 	}
 }
 
+var readLineTests = []struct {
+	Line  string
+	Error string
+}{
+	{"", ""},
+	{"#", ""},
+	{" #", ""},
+
+	{"vn x", "Normal: item length is incorrect"},
+	{"vt x", "TextureCoord: item length is incorrect"},
+	{"v 0 0 0", ""},
+	{"v x", "Vertex: item length is incorrect"},
+	{"v 0 x 0", "Vertex: unable to parse Y coordinate"},
+
+	{"vn 0 0 0", ""},
+
+	{"f 1", ""},
+
+	//TODO: better errors
+	{"f x", "strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/x/1", "strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/1/y", "strconv.ParseInt: parsing \"y\": invalid syntax"},
+}
+
 func TestReadLine(t *testing.T) {
 	var o Object
 
+	o.Vertices = make([]Vertex, 10)
+	o.Textures = make([]TextureCoord, 10)
+	o.Normals = make([]Normal, 10)
+
 	r := NewReader(nil).(*stdReader)
-	if err := r.readLine([]byte(""), &o); err != nil {
-		t.Errorf("readLine('', _) => %s, expected nil", err)
+
+	for _, test := range readLineTests {
+		err := r.readLine([]byte(test.Line), &o)
+		failed := false
+
+		if err == nil && test.Error != "" {
+			failed = true
+		} else if err != nil && test.Error != err.Error() {
+			failed = true
+		}
+
+		if failed {
+			t.Errorf("readLine('%s', _) => '%s', expected '%s'", test.Line, err, test.Error)
+		}
 	}
+
 }
 
 var objectBody = `
