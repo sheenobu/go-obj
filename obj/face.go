@@ -17,16 +17,18 @@ type Face struct {
 func parseFace(items [][]byte, o *Object) (f Face, err error) {
 
 	var lastVertexNormal int64 = -1
+	var vertexNormalIndex int64 = -1
 	var vertexIndex int64
-	var vertexNormalIndex int64
 
 	for _, i := range items {
 		vertexItems := splitByToken(i, '/')
 		if vertexIndex, err = strconv.ParseInt(string(vertexItems[0]), 10, 64); err != nil {
 			return
 		}
-		if vertexNormalIndex, err = strconv.ParseInt(string(vertexItems[2]), 10, 64); err != nil {
-			return
+		if len(vertexItems) > 2 {
+			if vertexNormalIndex, err = strconv.ParseInt(string(vertexItems[2]), 10, 64); err != nil {
+				return
+			}
 		}
 
 		f.Vertices = append(f.Vertices, o.Vertices[vertexIndex-1])
@@ -41,7 +43,9 @@ func parseFace(items [][]byte, o *Object) (f Face, err error) {
 		lastVertexNormal = vertexNormalIndex
 	}
 
-	f.Normal = o.Normals[lastVertexNormal-1]
+	if lastVertexNormal != -1 {
+		f.Normal = o.Normals[lastVertexNormal-1]
+	}
 
 	return
 }
