@@ -5,5 +5,6 @@ type Object struct {
 	Name     string
 	Vertices []Vertex
 	Normals  []Normal
+	Textures []TextureCoord
 	Faces    []Face
 }

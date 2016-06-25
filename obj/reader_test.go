@@ -15,6 +15,16 @@ func TestReadObject(t *testing.T) {
 	}
 }
 
+func TestReadBleh(t *testing.T) {
+	r := NewReader(bytes.NewBuffer([]byte(blehObject)))
+
+	_, err := r.Read()
+	if err != nil {
+		t.Errorf("Expected success, got err: '%s'", err)
+		return
+	}
+}
+
 func TestReadLine(t *testing.T) {
 	var o Object
 

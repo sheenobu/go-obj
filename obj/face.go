@@ -1,61 +1,36 @@
 package obj
 
-import (
-	"errors"
-	"fmt"
-	"io"
-	"strconv"
-)
+import "io"
 
-// A Face is a collection of Vertices and a Normal grouped together
+// A Face is a list of points
 type Face struct {
-	Index    int64
-	Vertices []Vertex
-	Normal   Normal //TODO: assumption, each face has one normal
+	Index  int64
+	Points []*Point
 }
 
 func parseFace(items [][]byte, o *Object) (f Face, err error) {
-
-	var lastVertexNormal int64 = -1
-	var vertexNormalIndex int64 = -1
-	var vertexIndex int64
+	var p *Point
 
 	for _, i := range items {
-		vertexItems := splitByToken(i, '/')
-		if vertexIndex, err = strconv.ParseInt(string(vertexItems[0]), 10, 64); err != nil {
+
+		p, err = parsePoint(i, o)
+		if err != nil {
 			return
 		}
-		if len(vertexItems) > 2 {
-			if vertexNormalIndex, err = strconv.ParseInt(string(vertexItems[2]), 10, 64); err != nil {
-				return
-			}
-		}
 
-		f.Vertices = append(f.Vertices, o.Vertices[vertexIndex-1])
-
-		if lastVertexNormal > 0 {
-			if lastVertexNormal != vertexNormalIndex {
-				err = errors.New("Face: Mismatched normal for face!")
-				return
-			}
-		}
-
-		lastVertexNormal = vertexNormalIndex
-	}
-
-	if lastVertexNormal != -1 {
-		f.Normal = o.Normals[lastVertexNormal-1]
+		f.Points = append(f.Points, p)
 	}
 
 	return
 }
 
 func writeFace(f *Face, w io.Writer) error {
-	for idx, v := range f.Vertices {
-		if _, err := w.Write([]byte(fmt.Sprintf("%d//%d", v.Index, f.Normal.Index))); err != nil {
+	for idx, p := range f.Points {
+		if err := writePoint(p, w); err != nil {
 			return err
 		}
-		if len(f.Vertices) != idx+1 {
+
+		if idx != len(f.Points)-1 {
 			if _, err := w.Write([]byte{' '}); err != nil {
 				return err
 			}

@@ -9,6 +9,7 @@ Currently supported fields:
  * v - Vertex
  * vn - Vertex Normal
  * f - Face
+ * vt - vertex texture coordinate indices
 
 Everyting else is silently ignored
 

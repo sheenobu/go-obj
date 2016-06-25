@@ -70,6 +70,13 @@ func (r *stdReader) readLine(line []byte, o *Object) error {
 		}
 		o.Normals = append(o.Normals, vn)
 		return nil
+	case "vt":
+		vt, err := parseTextCoord(rest)
+		if err != nil {
+			return err
+		}
+
+		o.Textures = append(o.Textures, vt)
 	case "f":
 		f, err := parseFace(rest, o)
 		if err != nil {
