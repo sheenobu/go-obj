@@ -6,7 +6,7 @@ import "fmt"
 type ParseError struct {
 	LineNumber int64
 	ItemType   string
-	Err        error
+	Err        []error
 }
 
 func (err *ParseError) Error() string {
@@ -16,7 +16,7 @@ func (err *ParseError) Error() string {
 		err.Err)
 }
 
-func wrapParseError(err error, lineNumber int64, itemType string) error {
+func wrapParseErrors(lineNumber int64, itemType string, err ...error) error {
 	return &ParseError{
 		LineNumber: lineNumber,
 		ItemType:   itemType,

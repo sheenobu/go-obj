@@ -62,28 +62,28 @@ func (r *stdReader) readLine(line []byte, lineNumber int64, o *Object) error {
 	case "v":
 		v, err := parseVertex(rest)
 		if err != nil {
-			return wrapParseError(err, lineNumber, "vertex (v)")
+			return wrapParseErrors(lineNumber, "vertex (v)", err)
 		}
 		o.Vertices = append(o.Vertices, v)
 		return nil
 	case "vn":
 		vn, err := parseNormal(rest)
 		if err != nil {
-			return wrapParseError(err, lineNumber, "vertexNormal (vn)")
+			return wrapParseErrors(lineNumber, "vertexNormal (vn)", err)
 		}
 		o.Normals = append(o.Normals, vn)
 		return nil
 	case "vt":
 		vt, err := parseTextCoord(rest)
 		if err != nil {
-			return wrapParseError(err, lineNumber, "textureCoordinate (vt)")
+			return wrapParseErrors(lineNumber, "textureCoordinate (vt)", err)
 		}
 
 		o.Textures = append(o.Textures, vt)
 	case "f":
 		f, err := parseFace(rest, o)
 		if err != nil {
-			return wrapParseError(err, lineNumber, "face (f)")
+			return wrapParseErrors(lineNumber, "face (f)", err)
 		}
 		o.Faces = append(o.Faces, f)
 		return nil
