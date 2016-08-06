@@ -31,28 +31,8 @@ func TestReadPoint(t *testing.T) {
 		p, err := parsePoint([]byte(test.Items), &dummyObject)
 
 		failed := false
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
-
-		if p != nil {
-			if !compareVertices(test.Point.Vertex, p.Vertex) {
-				failed = true
-			}
-
-			if !compareNormals(test.Point.Normal, p.Normal) {
-				failed = true
-			}
-
-			if !compareTextureCoords(test.Point.Texture, p.Texture) {
-				failed = true
-			}
-		} else {
-			failed = true
-		}
+		failed = failed || !compareErrors(err, test.Error)
+		failed = failed || !comparePoints(&test.Point, p)
 
 		if failed {
 			t.Errorf("parsePoint(%s) => %v, '%v', expected %v, '%v'", test.Items, p, err, test.Point, test.Error)
@@ -77,18 +57,11 @@ func TestWritePoint(t *testing.T) {
 		var buf bytes.Buffer
 		err := writePoint(&test.Point, &buf)
 
-		failed := false
-
 		body := string(buf.Bytes())
-		if test.Output != body {
-			failed = true
-		}
 
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+		failed := false
+		failed = failed || !compareErrors(err, test.Error)
+		failed = failed || test.Output != body
 
 		if failed {
 			t.Errorf("writePoint(%v, wr) => '%v', '%v', expected '%v', '%v'",

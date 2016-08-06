@@ -27,16 +27,9 @@ func TestReadNormal(t *testing.T) {
 		n, err := parseNormal(test.Items.ToByteList())
 
 		failed := false
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
-
-		if n.X != test.Normal.X || n.Y != test.Normal.Y || n.Z != test.Normal.Z {
-			failed = true
-		}
+		failed = failed || test.Error == "" && err != nil
+		failed = failed || err != nil && test.Error != err.Error()
+		failed = failed || (n.X != test.Normal.X || n.Y != test.Normal.Y || n.Z != test.Normal.Z)
 
 		if failed {
 			t.Errorf("parseNormal(%s) => %v, '%v', expected %v, '%v'", test.Items, n, err, test.Normal, test.Error)
@@ -59,19 +52,12 @@ func TestWriteNormal(t *testing.T) {
 	for _, test := range normalWriteTests {
 		var buf bytes.Buffer
 		err := writeNormal(&test.Normal, &buf)
+		body := string(buf.Bytes())
 
 		failed := false
-
-		body := string(buf.Bytes())
-		if test.Output != body {
-			failed = true
-		}
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+		failed = failed || test.Error == "" && err != nil
+		failed = failed || err != nil && test.Error != err.Error()
+		failed = failed || test.Output != body
 
 		if failed {
 			t.Errorf("writeNormal(%v, wr) => '%v', '%v', expected '%v', '%v'",

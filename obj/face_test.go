@@ -27,27 +27,14 @@ func TestReadFace(t *testing.T) {
 		f, err := parseFace(test.Items.ToByteList(), &dummyObject)
 
 		failed := false
+		failed = failed || !compareErrors(err, test.Error)
+		failed = failed || len(f.Points) != len(test.Face.Points)
 
-		if !compareErrors(err, test.Error) {
-			failed = true
-		}
-
-		if len(f.Points) != len(test.Face.Points) {
-			failed = true
-		} else {
-
+		if !failed {
 			for pidx, p := range f.Points {
-
-				if !compareVertices(p.Vertex, test.Face.Points[pidx].Vertex) {
-					failed = true
-				}
-
-				if !compareTextureCoords(p.Texture, test.Face.Points[pidx].Texture) {
-					failed = true
-				}
-
-				if !compareNormals(p.Normal, test.Face.Points[pidx].Normal) {
-					failed = true
+				failed = failed || !comparePoints(p, test.Face.Points[pidx])
+				if failed {
+					break
 				}
 			}
 		}
@@ -86,19 +73,11 @@ func TestWriteFace(t *testing.T) {
 	for _, test := range faceWriteTests {
 		var buf bytes.Buffer
 		err := writeFace(&test.Face, &buf)
+		body := string(buf.Bytes())
 
 		failed := false
-
-		body := string(buf.Bytes())
-		if test.Output != body {
-			failed = true
-		}
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+		failed = failed || !compareErrors(err, test.Error)
+		failed = failed || test.Output != body
 
 		if failed {
 			t.Errorf("writeFace(%v, wr) => '%v', '%v', expected '%v', '%v'",

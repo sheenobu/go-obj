@@ -27,16 +27,9 @@ func TestReadVertex(t *testing.T) {
 		v, err := parseVertex(test.Items.ToByteList())
 
 		failed := false
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
-
-		if v.X != test.Vertex.X || v.Y != test.Vertex.Y || v.Z != test.Vertex.Z {
-			failed = true
-		}
+		failed = failed || (test.Error == "" && err != nil)
+		failed = failed || (err != nil && test.Error != err.Error())
+		failed = failed || (v.X != test.Vertex.X || v.Y != test.Vertex.Y || v.Z != test.Vertex.Z)
 
 		if failed {
 			t.Errorf("parseVertex(%s) => %v, '%v', expected %v, '%v'", test.Items, v, err, test.Vertex, test.Error)
@@ -59,19 +52,12 @@ func TestWriteVertex(t *testing.T) {
 	for _, test := range vertexWriteTests {
 		var buf bytes.Buffer
 		err := writeVertex(&test.Vertex, &buf)
+		body := string(buf.Bytes())
 
 		failed := false
-
-		body := string(buf.Bytes())
-		if test.Output != body {
-			failed = true
-		}
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+		failed = failed || (test.Error == "" && err != nil)
+		failed = failed || (err != nil && test.Error != err.Error())
+		failed = failed || (test.Output != body)
 
 		if failed {
 			t.Errorf("writeVertex(%v, wr) => '%v', '%v', expected '%v', '%v'",

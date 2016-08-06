@@ -13,6 +13,24 @@ func (sl stringList) ToByteList() (arr [][]byte) {
 	return
 }
 
+func comparePoints(p1 *Point, p2 *Point) bool {
+
+	if p1 == p2 {
+		return true
+	}
+
+	if (p1 != nil && p2 == nil) || (p1 == nil && p2 != nil) {
+		return false
+	}
+
+	eq := true
+	eq = eq && compareVertices(p1.Vertex, p2.Vertex)
+	eq = eq && compareNormals(p1.Normal, p2.Normal)
+	eq = eq && compareTextureCoords(p1.Texture, p2.Texture)
+
+	return eq
+}
+
 func compareVertices(v1 *Vertex, v2 *Vertex) bool {
 	if v1 == nil && v2 != nil || v1 != nil && v2 == nil {
 		return false

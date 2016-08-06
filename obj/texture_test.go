@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-var tNullIndex = int64(-1)
+var tNullIndex = int64(0)
 
 var textureReadTests = []struct {
 	Items   stringList
@@ -28,16 +28,8 @@ func TestReadTexture(t *testing.T) {
 		n, err := parseTextCoord(test.Items.ToByteList())
 
 		failed := false
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
-
-		if n.U != test.Texture.U || n.V != test.Texture.V || n.W != test.Texture.W {
-			failed = true
-		}
+		failed = failed || !compareErrors(err, test.Error)
+		failed = failed || !compareTextureCoords(&n, &test.Texture)
 
 		if failed {
 			t.Errorf("parseTextCoord(%s) => %v, '%v', expected %v, '%v'", test.Items, n, err, test.Texture, test.Error)
@@ -60,19 +52,12 @@ func TestWriteTexture(t *testing.T) {
 	for _, test := range textureWriteTests {
 		var buf bytes.Buffer
 		err := writeTextCoord(&test.Texture, &buf)
+		body := string(buf.Bytes())
 
 		failed := false
-
-		body := string(buf.Bytes())
-		if test.Output != body {
-			failed = true
-		}
-
-		if test.Error == "" && err != nil {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+		failed = failed || (test.Error == "" && err != nil)
+		failed = failed || (err != nil && test.Error != err.Error())
+		failed = failed || (test.Output != body)
 
 		if failed {
 			t.Errorf("writeTextCoord(%v, wr) => '%v', '%v', expected '%v', '%v'",
