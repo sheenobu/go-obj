@@ -13,12 +13,12 @@ var vertexReadTests = []struct {
 	Vertex Vertex
 }{
 	{stringList{"1", "1", "1" /*-----------------------*/}, "" /*-------------------------------*/, Vertex{vNullIndex, 1, 1, 1}},
-	{stringList{"1", "1" /*----------------------------*/}, "Vertex: item length is incorrect" /**/, Vertex{vNullIndex, 0, 0, 0}},
+	{stringList{"1", "1" /*----------------------------*/}, "item length is incorrect" /**/, Vertex{vNullIndex, 0, 0, 0}},
 	{stringList{"1.000000", "-1.000000", "-1.000000" /**/}, "" /*-------------------------------*/, Vertex{vNullIndex, 1, -1, -1}},
 	{stringList{"0.999999", "-1.000000", "-1.000001" /**/}, "" /*-------------------------------*/, Vertex{vNullIndex, 0.999999, -1, -1.000001}},
-	{stringList{"x", "-1.000000", "-1.000001" /*-------*/}, "Vertex: unable to parse X coordinate" /*---*/, Vertex{vNullIndex, 0, 0, 0}},
-	{stringList{"1.000000", "y", "-1.000001" /*--------*/}, "Vertex: unable to parse Y coordinate" /*---*/, Vertex{vNullIndex, 1, 0, 0}},
-	{stringList{"1.000000", "1", "z" /*----------------*/}, "Vertex: unable to parse Z coordinate" /*---*/, Vertex{vNullIndex, 1, 1, 0}},
+	{stringList{"x", "-1.000000", "-1.000001" /*-------*/}, "unable to parse X coordinate" /*---*/, Vertex{vNullIndex, 0, 0, 0}},
+	{stringList{"1.000000", "y", "-1.000001" /*--------*/}, "unable to parse Y coordinate" /*---*/, Vertex{vNullIndex, 1, 0, 0}},
+	{stringList{"1.000000", "1", "z" /*----------------*/}, "unable to parse Z coordinate" /*---*/, Vertex{vNullIndex, 1, 1, 0}},
 }
 
 func TestReadVertex(t *testing.T) {

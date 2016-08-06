@@ -14,12 +14,12 @@ var textureReadTests = []struct {
 }{
 	{stringList{"1", "1", "1" /*---------------------*/}, "" /*-------------------------------*/, TextureCoord{tNullIndex, 1, 1, 1}},
 	{stringList{"1", "1" /*--------------------------*/}, "" /*-------------------------------*/, TextureCoord{tNullIndex, 1, 1, 0}},
-	{stringList{"1" /*------------------------------*/}, "TextureCoord: item length is incorrect" /**/, TextureCoord{tNullIndex, 0, 0, 0}},
+	{stringList{"1" /*------------------------------*/}, "item length is incorrect" /**/, TextureCoord{tNullIndex, 0, 0, 0}},
 	{stringList{"1.000", "-1.000", "-1.000" /*-------*/}, "" /*-------------------------------*/, TextureCoord{tNullIndex, 1, -1, -1}},
 	{stringList{"0.999", "-1.000", "-1.001" /*-------*/}, "" /*-------------------------------*/, TextureCoord{tNullIndex, 0.999, -1, -1.001}},
-	{stringList{"x", "-1.000", "-1.001" /*-----------*/}, "TextureCoord: unable to parse U coordinate" /*---*/, TextureCoord{tNullIndex, 0, 0, 0}},
-	{stringList{"1.000", "y", "-1.001" /*------------*/}, "TextureCoord: unable to parse V coordinate" /*---*/, TextureCoord{tNullIndex, 1, 0, 0}},
-	{stringList{"1.000", "1", "z" /*-----------------*/}, "TextureCoord: unable to parse W coordinate" /*---*/, TextureCoord{tNullIndex, 1, 1, 0}},
+	{stringList{"x", "-1.000", "-1.001" /*-----------*/}, "unable to parse U coordinate" /*---*/, TextureCoord{tNullIndex, 0, 0, 0}},
+	{stringList{"1.000", "y", "-1.001" /*------------*/}, "unable to parse V coordinate" /*---*/, TextureCoord{tNullIndex, 1, 0, 0}},
+	{stringList{"1.000", "1", "z" /*-----------------*/}, "unable to parse W coordinate" /*---*/, TextureCoord{tNullIndex, 1, 1, 0}},
 }
 
 func TestReadTexture(t *testing.T) {

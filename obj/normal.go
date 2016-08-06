@@ -17,19 +17,22 @@ type Normal struct {
 
 func parseNormal(items [][]byte) (n Normal, err error) {
 	if len(items) != 3 {
-		err = errors.New("Normal: item length is incorrect")
+		err = errors.New("item length is incorrect")
 		return
 	}
+
+	//TODO: check all, merge error types
+
 	if n.X, err = strconv.ParseFloat(string(items[0]), 64); err != nil {
-		err = errors.New("Normal: unable to parse X coordinate")
+		err = errors.New("unable to parse X coordinate")
 		return
 	}
 	if n.Y, err = strconv.ParseFloat(string(items[1]), 64); err != nil {
-		err = errors.New("Normal: unable to parse Y coordinate")
+		err = errors.New("unable to parse Y coordinate")
 		return
 	}
 	if n.Z, err = strconv.ParseFloat(string(items[2]), 64); err != nil {
-		err = errors.New("Normal: unable to parse Z coordinate")
+		err = errors.New("unable to parse Z coordinate")
 		return
 	}
 

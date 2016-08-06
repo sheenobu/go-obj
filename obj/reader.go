@@ -24,6 +24,7 @@ func (r *stdReader) Read() (*Object, error) {
 
 	var o Object
 
+	lineNumber := int64(1)
 	for {
 		line, err := buf.ReadBytes('\n')
 		if err == io.EOF {
@@ -33,13 +34,15 @@ func (r *stdReader) Read() (*Object, error) {
 			return nil, err
 		}
 
-		if err := r.readLine(line[0:len(line)-1], &o); err != nil {
+		if err := r.readLine(line[0:len(line)-1], lineNumber, &o); err != nil {
 			return nil, err
 		}
+
+		lineNumber++
 	}
 }
 
-func (r *stdReader) readLine(line []byte, o *Object) error {
+func (r *stdReader) readLine(line []byte, lineNumber int64, o *Object) error {
 
 	//TODO: cyclomic complexity is 11. Would a 'router' be better here?
 
@@ -59,28 +62,28 @@ func (r *stdReader) readLine(line []byte, o *Object) error {
 	case "v":
 		v, err := parseVertex(rest)
 		if err != nil {
-			return err
+			return wrapParseError(err, lineNumber, "vertex (v)")
 		}
 		o.Vertices = append(o.Vertices, v)
 		return nil
 	case "vn":
 		vn, err := parseNormal(rest)
 		if err != nil {
-			return err
+			return wrapParseError(err, lineNumber, "vertexNormal (vn)")
 		}
 		o.Normals = append(o.Normals, vn)
 		return nil
 	case "vt":
 		vt, err := parseTextCoord(rest)
 		if err != nil {
-			return err
+			return wrapParseError(err, lineNumber, "textureCoordinate (vt)")
 		}
 
 		o.Textures = append(o.Textures, vt)
 	case "f":
 		f, err := parseFace(rest, o)
 		if err != nil {
-			return err
+			return wrapParseError(err, lineNumber, "face (f)")
 		}
 		o.Faces = append(o.Faces, f)
 		return nil

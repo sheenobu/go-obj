@@ -17,19 +17,21 @@ type Vertex struct {
 
 func parseVertex(items [][]byte) (v Vertex, err error) {
 	if len(items) != 3 {
-		err = errors.New("Vertex: item length is incorrect")
+		err = errors.New("item length is incorrect")
 		return
 	}
+
+	//TODO: verify each field, merge errors
 	if v.X, err = strconv.ParseFloat(string(items[0]), 64); err != nil {
-		err = errors.New("Vertex: unable to parse X coordinate")
+		err = errors.New("unable to parse X coordinate")
 		return
 	}
 	if v.Y, err = strconv.ParseFloat(string(items[1]), 64); err != nil {
-		err = errors.New("Vertex: unable to parse Y coordinate")
+		err = errors.New("unable to parse Y coordinate")
 		return
 	}
 	if v.Z, err = strconv.ParseFloat(string(items[2]), 64); err != nil {
-		err = errors.New("Vertex: unable to parse Z coordinate")
+		err = errors.New("unable to parse Z coordinate")
 		return
 	}
 

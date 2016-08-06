@@ -33,20 +33,20 @@ var readLineTests = []struct {
 	{"#", ""},
 	{" #", ""},
 
-	{"vn x", "Normal: item length is incorrect"},
-	{"vt x", "TextureCoord: item length is incorrect"},
+	{"vn x", "Parse error at line 0 for vertexNormal (vn): item length is incorrect"},
+	{"vt x", "Parse error at line 0 for textureCoordinate (vt): item length is incorrect"},
 	{"v 0 0 0", ""},
-	{"v x", "Vertex: item length is incorrect"},
-	{"v 0 x 0", "Vertex: unable to parse Y coordinate"},
+	{"v x", "Parse error at line 0 for vertex (v): item length is incorrect"},
+	{"v 0 x 0", "Parse error at line 0 for vertex (v): unable to parse Y coordinate"},
 
 	{"vn 0 0 0", ""},
 
 	{"f 1", ""},
 
 	//TODO: better errors
-	{"f x", "strconv.ParseInt: parsing \"x\": invalid syntax"},
-	{"f 1/x/1", "strconv.ParseInt: parsing \"x\": invalid syntax"},
-	{"f 1/1/y", "strconv.ParseInt: parsing \"y\": invalid syntax"},
+	{"f x", "Parse error at line 0 for face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/x/1", "Parse error at line 0 for face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/1/y", "Parse error at line 0 for face (f): strconv.ParseInt: parsing \"y\": invalid syntax"},
 }
 
 func TestReadLine(t *testing.T) {
@@ -59,7 +59,7 @@ func TestReadLine(t *testing.T) {
 	r := NewReader(nil).(*stdReader)
 
 	for _, test := range readLineTests {
-		err := r.readLine([]byte(test.Line), &o)
+		err := r.readLine([]byte(test.Line), 0, &o)
 		failed := false
 
 		if err == nil && test.Error != "" {
