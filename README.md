@@ -13,11 +13,16 @@ Currently supported fields:
 
 Everyting else is silently ignored
 
+## cmd/obj-renderer
+
+This is a standard object renderer, using a simple GLSL shader (embedded) for lighting.
+
+Usage:
+
+	$ obj-renderer <filename>
+
 ## TODO
 
- * Renderers
-   * OpenGL
-   * ???
  * obj.Writer interface
  * The gometalinter says all the table based tests are the same. Try to abstract them?
  * Materials aren't supported.
