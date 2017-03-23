@@ -1,25 +1,11 @@
 package obj
 
-import "fmt"
+import "github.com/pkg/errors"
 
-// ParseError represents an error in parsing
-type ParseError struct {
-	LineNumber int64
-	ItemType   string
-	Err        []error
+func wrapLineNumber(lineNumber int64, err error) error {
+	return errors.Wrapf(err, "error at line %d", lineNumber)
 }
 
-func (err *ParseError) Error() string {
-	return fmt.Sprintf("Parse error at line %d for %s: %s",
-		err.LineNumber,
-		err.ItemType,
-		err.Err)
-}
-
-func wrapParseErrors(lineNumber int64, itemType string, err ...error) error {
-	return &ParseError{
-		LineNumber: lineNumber,
-		ItemType:   itemType,
-		Err:        err,
-	}
+func wrapParseErrors(itemType string, err error) error {
+	return errors.Wrapf(err, "error parsing %s", itemType)
 }

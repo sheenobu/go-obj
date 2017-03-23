@@ -33,20 +33,20 @@ var readLineTests = []struct {
 	{"#", ""},
 	{" #", ""},
 
-	{"vn x", "Parse error at line 0 for vertexNormal (vn): [item length is incorrect]"},
-	{"vt x", "Parse error at line 0 for textureCoordinate (vt): [item length is incorrect]"},
+	{"vn x", "error at line 0: error parsing vertexNormal (vn): item length is incorrect"},
+	{"vt x", "error at line 0: error parsing textureCoordinate (vt): item length is incorrect"},
 	{"v 0 0 0", ""},
-	{"v x", "Parse error at line 0 for vertex (v): [item length is incorrect]"},
-	{"v 0 x 0", "Parse error at line 0 for vertex (v): [unable to parse Y coordinate]"},
+	{"v x", "error at line 0: error parsing vertex (v): item length is incorrect"},
+	{"v 0 x 0", "error at line 0: error parsing vertex (v): unable to parse Y coordinate"},
 
 	{"vn 0 0 0", ""},
 
 	{"f 1", ""},
 
 	//TODO: better errors
-	{"f x", "Parse error at line 0 for face (f): [strconv.ParseInt: parsing \"x\": invalid syntax]"},
-	{"f 1/x/1", "Parse error at line 0 for face (f): [strconv.ParseInt: parsing \"x\": invalid syntax]"},
-	{"f 1/1/y", "Parse error at line 0 for face (f): [strconv.ParseInt: parsing \"y\": invalid syntax]"},
+	{"f x", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/x/1", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
+	{"f 1/1/y", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"y\": invalid syntax"},
 }
 
 func TestReadLine(t *testing.T) {
