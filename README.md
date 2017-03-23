@@ -4,7 +4,7 @@ OBJ file loader
 
 Currently supported fields:
 
- * # - comments , ignored
+ * \# - comments , ignored
  * o - Object Name??
  * v - Vertex
  * vn - Vertex Normal
@@ -32,6 +32,9 @@ Usage:
 
 ### Byte Array Usages
 
-The majority of the obj.Reader is designed to use byte arrays, not strings. This is to keep
+UPDATE: I think the new router makes this invalid as the byte slices are being copied around
+functions.
+
+The majority of the obj.Reader is designed to use byte slices, not strings. This is to keep
 the memory footprint low as each line is considered one contigious region of memory
 and never copied. In my opinion, it's a premature optimization but a good experiment.
