@@ -2,6 +2,7 @@ package obj
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -27,16 +28,19 @@ func TestReadPoint(t *testing.T) {
 	dummyObject.Textures[2] = TextureCoord{3, 9, 1, 2}
 
 	for _, test := range pointReadTests {
+		name := fmt.Sprintf("parsePoint(%s)", test.Items)
+		t.Run(name, func(t *testing.T) {
+			p, err := parsePoint([]byte(test.Items), &dummyObject)
 
-		p, err := parsePoint([]byte(test.Items), &dummyObject)
+			failed := false
+			failed = failed || !compareErrors(err, test.Error)
+			failed = failed || !comparePoints(&test.Point, p)
 
-		failed := false
-		failed = failed || !compareErrors(err, test.Error)
-		failed = failed || !comparePoints(&test.Point, p)
+			if failed {
+				t.Errorf("got %v, '%v', expected %v, '%v'", p, err, test.Point, test.Error)
+			}
 
-		if failed {
-			t.Errorf("parsePoint(%s) => %v, '%v', expected %v, '%v'", test.Items, p, err, test.Point, test.Error)
-		}
+		})
 	}
 }
 
@@ -54,19 +58,21 @@ var pointWriteTests = []struct {
 func TestWritePoint(t *testing.T) {
 
 	for _, test := range pointWriteTests {
-		var buf bytes.Buffer
-		err := writePoint(&test.Point, &buf)
+		name := fmt.Sprintf("writePoint(%v, wr)", test.Point)
+		t.Run(name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := writePoint(&test.Point, &buf)
 
-		body := string(buf.Bytes())
+			body := string(buf.Bytes())
 
-		failed := false
-		failed = failed || !compareErrors(err, test.Error)
-		failed = failed || test.Output != body
+			failed := false
+			failed = failed || !compareErrors(err, test.Error)
+			failed = failed || test.Output != body
 
-		if failed {
-			t.Errorf("writePoint(%v, wr) => '%v', '%v', expected '%v', '%v'",
-				test.Point, body, err, test.Output, test.Error)
-		}
+			if failed {
+				t.Errorf("got '%v', '%v', expected '%v', '%v'", body, err, test.Output, test.Error)
+			}
+		})
 	}
 
 }

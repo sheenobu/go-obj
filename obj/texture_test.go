@@ -2,6 +2,7 @@ package obj
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -25,15 +26,18 @@ var textureReadTests = []struct {
 func TestReadTexture(t *testing.T) {
 
 	for _, test := range textureReadTests {
-		n, err := parseTextCoord(test.Items.ToByteList())
+		name := fmt.Sprintf("parseTextCoord(%s)", test.Items)
+		t.Run(name, func(t *testing.T) {
+			n, err := parseTextCoord(test.Items.ToByteList())
 
-		failed := false
-		failed = failed || !compareErrors(err, test.Error)
-		failed = failed || !compareTextureCoords(&n, &test.Texture)
+			failed := false
+			failed = failed || !compareErrors(err, test.Error)
+			failed = failed || !compareTextureCoords(&n, &test.Texture)
 
-		if failed {
-			t.Errorf("parseTextCoord(%s) => %v, '%v', expected %v, '%v'", test.Items, n, err, test.Texture, test.Error)
-		}
+			if failed {
+				t.Errorf("got %v, '%v', expected %v, '%v'", n, err, test.Texture, test.Error)
+			}
+		})
 	}
 }
 
@@ -50,19 +54,21 @@ var textureWriteTests = []struct {
 func TestWriteTexture(t *testing.T) {
 
 	for _, test := range textureWriteTests {
-		var buf bytes.Buffer
-		err := writeTextCoord(&test.Texture, &buf)
-		body := string(buf.Bytes())
+		name := fmt.Sprintf("writeTextCoord(%v, wr)", test.Texture)
+		t.Run(name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := writeTextCoord(&test.Texture, &buf)
+			body := string(buf.Bytes())
 
-		failed := false
-		failed = failed || (test.Error == "" && err != nil)
-		failed = failed || (err != nil && test.Error != err.Error())
-		failed = failed || (test.Output != body)
+			failed := false
+			failed = failed || (test.Error == "" && err != nil)
+			failed = failed || (err != nil && test.Error != err.Error())
+			failed = failed || (test.Output != body)
 
-		if failed {
-			t.Errorf("writeTextCoord(%v, wr) => '%v', '%v', expected '%v', '%v'",
-				test.Texture, body, err, test.Output, test.Error)
-		}
+			if failed {
+				t.Errorf("got '%v', '%v', expected '%v', '%v'",
+					body, err, test.Output, test.Error)
+			}
+		})
 	}
-
 }

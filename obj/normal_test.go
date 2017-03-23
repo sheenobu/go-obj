@@ -2,6 +2,7 @@ package obj
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -24,16 +25,20 @@ var normalReadTests = []struct {
 func TestReadNormal(t *testing.T) {
 
 	for _, test := range normalReadTests {
-		n, err := parseNormal(test.Items.ToByteList())
 
-		failed := false
-		failed = failed || test.Error == "" && err != nil
-		failed = failed || err != nil && test.Error != err.Error()
-		failed = failed || (n.X != test.Normal.X || n.Y != test.Normal.Y || n.Z != test.Normal.Z)
+		name := fmt.Sprintf("parseNormal(%s)", test.Items)
+		t.Run(name, func(t *testing.T) {
+			n, err := parseNormal(test.Items.ToByteList())
 
-		if failed {
-			t.Errorf("parseNormal(%s) => %v, '%v', expected %v, '%v'", test.Items, n, err, test.Normal, test.Error)
-		}
+			failed := false
+			failed = failed || test.Error == "" && err != nil
+			failed = failed || err != nil && test.Error != err.Error()
+			failed = failed || (n.X != test.Normal.X || n.Y != test.Normal.Y || n.Z != test.Normal.Z)
+
+			if failed {
+				t.Errorf("got %v, '%v', expected %v, '%v'", n, err, test.Normal, test.Error)
+			}
+		})
 	}
 }
 
@@ -50,19 +55,22 @@ var normalWriteTests = []struct {
 func TestWriteNormal(t *testing.T) {
 
 	for _, test := range normalWriteTests {
-		var buf bytes.Buffer
-		err := writeNormal(&test.Normal, &buf)
-		body := string(buf.Bytes())
 
-		failed := false
-		failed = failed || test.Error == "" && err != nil
-		failed = failed || err != nil && test.Error != err.Error()
-		failed = failed || test.Output != body
+		name := fmt.Sprintf("writeNormal(%v, wr)", test.Normal)
+		t.Run(name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := writeNormal(&test.Normal, &buf)
+			body := string(buf.Bytes())
 
-		if failed {
-			t.Errorf("writeNormal(%v, wr) => '%v', '%v', expected '%v', '%v'",
-				test.Normal, body, err, test.Output, test.Error)
-		}
+			failed := false
+			failed = failed || test.Error == "" && err != nil
+			failed = failed || err != nil && test.Error != err.Error()
+			failed = failed || test.Output != body
+
+			if failed {
+				t.Errorf("'%v', '%v', expected '%v', '%v'", body, err, test.Output, test.Error)
+			}
+		})
 	}
 
 }

@@ -1,6 +1,9 @@
 package obj
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var splitTests = []struct {
 	Input  []byte
@@ -15,24 +18,26 @@ var splitTests = []struct {
 
 func TestSplitByToken(t *testing.T) {
 	for _, test := range splitTests {
-		res := splitByToken(test.Input, test.Token)
+		name := fmt.Sprintf("splitByToken([]byte(%s), '%c')", test.Input, test.Token)
+		t.Run(name, func(t *testing.T) {
+			res := splitByToken(test.Input, test.Token)
 
-		failed := false
+			failed := false
 
-		if len(res) != len(test.Output) {
-			failed = true
-		} else {
-			for i, item := range res {
-				if string(item) != string(test.Output[i]) {
-					failed = true
+			if len(res) != len(test.Output) {
+				failed = true
+			} else {
+				for i, item := range res {
+					if string(item) != string(test.Output[i]) {
+						failed = true
+					}
 				}
 			}
-		}
 
-		if failed {
-			t.Errorf("splitByToken([]byte(%s), '%c') => %s, expected %s",
-				test.Input, test.Token, res, test.Output)
-		}
+			if failed {
+				t.Errorf("got %s, expected %s", res, test.Output)
+			}
+		})
 	}
 
 }

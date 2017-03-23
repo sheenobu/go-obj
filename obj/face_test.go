@@ -2,6 +2,7 @@ package obj
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -24,24 +25,28 @@ func TestReadFace(t *testing.T) {
 	dummyObject.Normals[0] = Normal{1, 1, 2, 3}
 
 	for _, test := range faceReadTests {
-		f, err := parseFace(test.Items.ToByteList(), &dummyObject)
+		name := fmt.Sprintf("parseFace(%s)", test.Items)
 
-		failed := false
-		failed = failed || !compareErrors(err, test.Error)
-		failed = failed || len(f.Points) != len(test.Face.Points)
+		t.Run(name, func(t *testing.T) {
+			f, err := parseFace(test.Items.ToByteList(), &dummyObject)
 
-		if !failed {
-			for pidx, p := range f.Points {
-				failed = failed || !comparePoints(p, test.Face.Points[pidx])
-				if failed {
-					break
+			failed := false
+			failed = failed || !compareErrors(err, test.Error)
+			failed = failed || len(f.Points) != len(test.Face.Points)
+
+			if !failed {
+				for pidx, p := range f.Points {
+					failed = failed || !comparePoints(p, test.Face.Points[pidx])
+					if failed {
+						break
+					}
 				}
 			}
-		}
 
-		if failed {
-			t.Errorf("parseFace(%s) => %v, '%v', expected %v, '%v'", test.Items, f, err, test.Face, test.Error)
-		}
+			if failed {
+				t.Errorf("got %v, '%v', expected %v, '%v'", f, err, test.Face, test.Error)
+			}
+		})
 	}
 }
 
@@ -71,18 +76,22 @@ var faceWriteTests = []struct {
 func TestWriteFace(t *testing.T) {
 
 	for _, test := range faceWriteTests {
-		var buf bytes.Buffer
-		err := writeFace(&test.Face, &buf)
-		body := string(buf.Bytes())
+		name := fmt.Sprintf("writeFace(%v, wr)", test.Face)
 
-		failed := false
-		failed = failed || !compareErrors(err, test.Error)
-		failed = failed || test.Output != body
+		t.Run(name, func(t *testing.T) {
+			var buf bytes.Buffer
+			err := writeFace(&test.Face, &buf)
+			body := string(buf.Bytes())
 
-		if failed {
-			t.Errorf("writeFace(%v, wr) => '%v', '%v', expected '%v', '%v'",
-				test.Face, body, err, test.Output, test.Error)
-		}
+			failed := false
+			failed = failed || !compareErrors(err, test.Error)
+			failed = failed || test.Output != body
+
+			if failed {
+				t.Errorf("got '%v', '%v', expected '%v', '%v'",
+					body, err, test.Output, test.Error)
+			}
+		})
 	}
 
 }

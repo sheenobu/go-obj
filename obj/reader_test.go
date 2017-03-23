@@ -2,6 +2,7 @@ package obj
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 )
 
@@ -59,18 +60,21 @@ func TestReadLine(t *testing.T) {
 	r := NewReader(nil).(*stdReader)
 
 	for _, test := range readLineTests {
-		err := r.readLine([]byte(test.Line), 0, &o)
-		failed := false
+		tname := fmt.Sprintf("readLine('%s', _)", test.Line)
+		t.Run(tname, func(t *testing.T) {
+			err := r.readLine([]byte(test.Line), 0, &o)
+			failed := false
 
-		if err == nil && test.Error != "" {
-			failed = true
-		} else if err != nil && test.Error != err.Error() {
-			failed = true
-		}
+			if err == nil && test.Error != "" {
+				failed = true
+			} else if err != nil && test.Error != err.Error() {
+				failed = true
+			}
 
-		if failed {
-			t.Errorf("readLine('%s', _) => '%s', expected '%s'", test.Line, err, test.Error)
-		}
+			if failed {
+				t.Errorf("got %s', expected '%s'", err, test.Error)
+			}
+		})
 	}
 
 }
