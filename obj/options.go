@@ -1,8 +1,9 @@
 package obj
 
 import (
-	"errors"
 	"fmt"
+
+	"github.com/pkg/errors"
 )
 
 // A ReaderOption is a functional option
@@ -27,6 +28,23 @@ func WithUnknown(h Handler) ReaderOption {
 // ErrorHandler is a handler which returns an error
 func ErrorHandler(o *Object, token string, rest ...[]byte) error {
 	return errors.New("error from error handler")
+}
+
+// WithRestrictedTypes registeres an unknown handler
+// that errors out only if the key is outside the given
+// list.
+func WithRestrictedTypes(typ ...string) ReaderOption {
+	var m = make(map[string]bool)
+	for _, t := range typ {
+		m[t] = true
+	}
+	return WithUnknown(func(o *Object, token string, rest ...[]byte) error {
+		_, ok := m[token]
+		if ok {
+			return nil
+		}
+		return errors.New("element type restricted")
+	})
 }
 
 func parseErrorHandler(desc string, h Handler) Handler {

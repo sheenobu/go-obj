@@ -64,6 +64,9 @@ var readLineTests = []struct {
 	{"asd", "error at line 0: error parsing unknown element (asd): error from error handler", opts{WithUnknown(ErrorHandler)}},
 	{"asd 1", "", opts{WithType("asd", "my-custom-type", customType)}},
 	{"asd 2", "error at line 0: error parsing my-custom-type (asd): item 1 should be odd, is even", opts{WithType("asd", "my-custom-type", customType)}},
+	{"asd 2", "error at line 0: error parsing unknown element (asd): element type restricted", opts{WithRestrictedTypes(StandardSet...)}},
+
+	{"mtlib", "", opts{WithRestrictedTypes(StandardSet...)}},
 
 	{"vn x", "error at line 0: error parsing vertexNormal (vn): item length is incorrect", none},
 	{"vt x", "error at line 0: error parsing textureCoordinate (vt): item length is incorrect", none},
