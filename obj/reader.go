@@ -6,16 +6,20 @@ import (
 	"strings"
 )
 
+// A Handler is a handler for a given line
+type Handler func(o *Object, token string, rest ...[]byte) error
+
 // Reader is responsible for reading the Object
 type Reader interface {
 	Read() (*Object, error)
 }
 
-// NewReader creates a new reader frrouter the given io reader
-func NewReader(r io.Reader) Reader {
+// NewReader creates a new reader for the given io reader
+func NewReader(r io.Reader, os ...ReaderOption) Reader {
 	sr := &stdReader{
-		r:      r,
-		router: make(objectRouter),
+		r:       r,
+		router:  make(objectRouter),
+		unknown: emptyUnknown,
 	}
 	sr.router["#"] = commentHandler
 	sr.router["o"] = objectHandler
@@ -23,12 +27,18 @@ func NewReader(r io.Reader) Reader {
 	sr.router["vn"] = normalHandler
 	sr.router["vt"] = textureHandler
 	sr.router["f"] = faceHandler
+
+	for _, o := range os {
+		o(sr)
+	}
+
 	return sr
 }
 
 type stdReader struct {
-	r      io.Reader
-	router objectRouter
+	r       io.Reader
+	router  objectRouter
+	unknown Handler
 }
 
 func (r *stdReader) Read() (*Object, error) {
@@ -61,23 +71,30 @@ func (r *stdReader) readLine(line []byte, lineNumber int64, o *Object) error {
 
 	tokens := splitByToken(line, ' ')
 
-	if _, err := r.router.Route(o, tokens...); err != nil {
+	ok, err := r.router.Route(o, tokens...)
+	if err == nil && !ok {
+		// not routed
+		typ := strings.TrimSpace(string(tokens[0])) // TODO: duplicate code from router
+		rest := tokens[1:]                          // TODO: duplicate code from router
+		err = r.unknown(o, typ, rest...)
+	}
+	if err != nil {
 		return wrapLineNumber(lineNumber, err)
 	}
 
 	return nil
 }
 
-func commentHandler(o *Object, rest ...[]byte) error {
+func commentHandler(o *Object, token string, rest ...[]byte) error {
 	return nil
 }
 
-func objectHandler(o *Object, rest ...[]byte) error {
+func objectHandler(o *Object, token string, rest ...[]byte) error {
 	o.Name = string(rest[0])
 	return nil
 }
 
-func vertexHandler(o *Object, rest ...[]byte) error {
+func vertexHandler(o *Object, token string, rest ...[]byte) error {
 	v, err := parseVertex(rest)
 	if err != nil {
 		return wrapParseErrors("vertex (v)", err)
@@ -86,7 +103,7 @@ func vertexHandler(o *Object, rest ...[]byte) error {
 	return nil
 }
 
-func normalHandler(o *Object, rest ...[]byte) error {
+func normalHandler(o *Object, token string, rest ...[]byte) error {
 	vn, err := parseNormal(rest)
 	if err != nil {
 		return wrapParseErrors("vertexNormal (vn)", err)
@@ -95,7 +112,7 @@ func normalHandler(o *Object, rest ...[]byte) error {
 	return nil
 }
 
-func textureHandler(o *Object, rest ...[]byte) error {
+func textureHandler(o *Object, token string, rest ...[]byte) error {
 	vt, err := parseTextCoord(rest)
 	if err != nil {
 		return wrapParseErrors("textureCoordinate (vt)", err)
@@ -105,7 +122,7 @@ func textureHandler(o *Object, rest ...[]byte) error {
 	return nil
 }
 
-func faceHandler(o *Object, rest ...[]byte) error {
+func faceHandler(o *Object, token string, rest ...[]byte) error {
 	f, err := parseFace(rest, o)
 	if err != nil {
 		return wrapParseErrors("face (f)", err)
@@ -114,7 +131,7 @@ func faceHandler(o *Object, rest ...[]byte) error {
 	return nil
 }
 
-type objectRouter map[string]func(*Object, ...[]byte) error
+type objectRouter map[string]Handler
 
 // Route returns true if the list of tokens has been routed, false if it has been skipped
 func (router objectRouter) Route(o *Object, tokens ...[]byte) (bool, error) {
@@ -125,10 +142,14 @@ func (router objectRouter) Route(o *Object, tokens ...[]byte) (bool, error) {
 	}
 	rest := tokens[1:]
 
-	err := r(o, rest...)
+	err := r(o, typ, rest...)
 	if err != nil {
 		return false, err
 	}
 
 	return true, nil
+}
+
+func emptyUnknown(o *Object, token string, rest ...[]byte) error {
+	return nil
 }

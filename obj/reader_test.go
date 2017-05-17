@@ -3,7 +3,10 @@ package obj
 import (
 	"bytes"
 	"fmt"
+	"strconv"
 	"testing"
+
+	"github.com/pkg/errors"
 )
 
 func TestReadObject(t *testing.T) {
@@ -26,29 +29,56 @@ func TestReadBleh(t *testing.T) {
 	}
 }
 
+type opts []ReaderOption
+
+var none = []ReaderOption{}
+
+func customType(o *Object, token string, r ...[]byte) error {
+	if len(r) != 1 {
+		return errors.Errorf("got %d parameters, needed %d", len(r), 1)
+	}
+	itemStr := string(r[0])
+	item, err := strconv.ParseInt(itemStr, 10, 64)
+	if err != nil {
+		return errors.Wrapf(err, "error parsing item 1 (%s)", itemStr)
+	}
+
+	if item%2 == 0 {
+		return errors.New("item 1 should be odd, is even")
+	}
+
+	o.AddCustom("asd", &struct{}{})
+
+	return nil
+}
+
 var readLineTests = []struct {
-	Line  string
-	Error string
+	Line          string
+	Error         string
+	ReaderOptions opts
 }{
-	{"", ""},
-	{"#", ""},
-	{" #", ""},
-	{"asd", ""}, // unknown fields are silently ignored right now
+	{"", "", none},
+	{"#", "", none},
+	{" #", "", none},
+	{"asd", "", none}, // unknown fields are silently ignored right now
+	{"asd", "error at line 0: error parsing unknown element (asd): error from error handler", opts{WithUnknown(ErrorHandler)}},
+	{"asd 1", "", opts{WithType("asd", "my-custom-type", customType)}},
+	{"asd 2", "error at line 0: error parsing my-custom-type (asd): item 1 should be odd, is even", opts{WithType("asd", "my-custom-type", customType)}},
 
-	{"vn x", "error at line 0: error parsing vertexNormal (vn): item length is incorrect"},
-	{"vt x", "error at line 0: error parsing textureCoordinate (vt): item length is incorrect"},
-	{"v 0 0 0", ""},
-	{"v x", "error at line 0: error parsing vertex (v): item length is incorrect"},
-	{"v 0 x 0", "error at line 0: error parsing vertex (v): unable to parse Y coordinate"},
+	{"vn x", "error at line 0: error parsing vertexNormal (vn): item length is incorrect", none},
+	{"vt x", "error at line 0: error parsing textureCoordinate (vt): item length is incorrect", none},
+	{"v 0 0 0", "", none},
+	{"v x", "error at line 0: error parsing vertex (v): item length is incorrect", none},
+	{"v 0 x 0", "error at line 0: error parsing vertex (v): unable to parse Y coordinate", none},
 
-	{"vn 0 0 0", ""},
+	{"vn 0 0 0", "", none},
 
-	{"f 1", ""},
+	{"f 1", "", none},
 
 	//TODO: better errors
-	{"f x", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
-	{"f 1/x/1", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax"},
-	{"f 1/1/y", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"y\": invalid syntax"},
+	{"f x", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax", none},
+	{"f 1/x/1", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"x\": invalid syntax", none},
+	{"f 1/1/y", "error at line 0: error parsing face (f): strconv.ParseInt: parsing \"y\": invalid syntax", none},
 }
 
 func TestReadLine(t *testing.T) {
@@ -58,11 +88,12 @@ func TestReadLine(t *testing.T) {
 	o.Textures = make([]TextureCoord, 10)
 	o.Normals = make([]Normal, 10)
 
-	r := NewReader(nil).(*stdReader)
-
 	for _, test := range readLineTests {
-		tname := fmt.Sprintf("readLine('%s', _)", test.Line)
+		tname := fmt.Sprintf("readLine('%s', _, '%v')", test.Line, test.ReaderOptions)
 		t.Run(tname, func(t *testing.T) {
+
+			r := NewReader(nil, test.ReaderOptions...).(*stdReader)
+
 			err := r.readLine([]byte(test.Line), 0, &o)
 			failed := false
 
