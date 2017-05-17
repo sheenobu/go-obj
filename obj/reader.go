@@ -3,6 +3,7 @@ package obj
 import (
 	"bufio"
 	"io"
+	"strings"
 )
 
 // Reader is responsible for reading the Object
@@ -117,7 +118,8 @@ type objectRouter map[string]func(*Object, ...[]byte) error
 
 // Route returns true if the list of tokens has been routed, false if it has been skipped
 func (router objectRouter) Route(o *Object, tokens ...[]byte) (bool, error) {
-	r, ok := router[string(tokens[0])]
+	typ := strings.TrimSpace(string(tokens[0]))
+	r, ok := router[typ]
 	if !ok {
 		return false, nil
 	}

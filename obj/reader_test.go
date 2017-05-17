@@ -33,6 +33,7 @@ var readLineTests = []struct {
 	{"", ""},
 	{"#", ""},
 	{" #", ""},
+	{"asd", ""}, // unknown fields are silently ignored right now
 
 	{"vn x", "error at line 0: error parsing vertexNormal (vn): item length is incorrect"},
 	{"vt x", "error at line 0: error parsing textureCoordinate (vt): item length is incorrect"},
