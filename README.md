@@ -11,7 +11,15 @@ Currently supported fields:
  * f - Face
  * vt - vertex texture coordinate indices
 
-Everyting else is silently ignored
+Everything else is silently ignored
+
+## Usage
+
+Simply `go get github.com/sheenobu/go-obj/obj`.
+
+Much of the code outside of `go-obj/obj`
+relies on SDL2 and vendored code but `go-obj/obj` should
+be generic and never fail to pull due to Cgo dependencies (#5).
 
 ## cmd/obj-renderer
 
@@ -28,13 +36,3 @@ Usage:
  * Materials aren't supported.
  * Logging
 
-## Notes
-
-### Byte Array Usages
-
-UPDATE: I think the new router makes this invalid as the byte slices are being copied around
-functions.
-
-The majority of the obj.Reader is designed to use byte slices, not strings. This is to keep
-the memory footprint low as each line is considered one contigious region of memory
-and never copied. In my opinion, it's a premature optimization but a good experiment.
