@@ -26,7 +26,7 @@ func WithUnknown(h Handler) ReaderOption {
 }
 
 // ErrorHandler is a handler which returns an error
-func ErrorHandler(o *Object, token string, rest ...[]byte) error {
+func ErrorHandler(o *Object, token string, rest ...string) error {
 	return errors.New("error from error handler")
 }
 
@@ -38,7 +38,7 @@ func WithRestrictedTypes(typ ...string) ReaderOption {
 	for _, t := range typ {
 		m[t] = true
 	}
-	return WithUnknown(func(o *Object, token string, rest ...[]byte) error {
+	return WithUnknown(func(o *Object, token string, rest ...string) error {
 		_, ok := m[token]
 		if ok {
 			return nil
@@ -48,7 +48,7 @@ func WithRestrictedTypes(typ ...string) ReaderOption {
 }
 
 func parseErrorHandler(desc string, h Handler) Handler {
-	return func(o *Object, token string, rest ...[]byte) error {
+	return func(o *Object, token string, rest ...string) error {
 		err := h(o, token, rest...)
 		if err != nil {
 			return wrapParseErrors(fmt.Sprintf("%s (%s)", desc, token), err)

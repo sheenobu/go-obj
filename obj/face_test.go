@@ -28,7 +28,7 @@ func TestReadFace(t *testing.T) {
 		name := fmt.Sprintf("parseFace(%s)", test.Items)
 
 		t.Run(name, func(t *testing.T) {
-			f, err := parseFace(test.Items.ToByteList(), &dummyObject)
+			f, err := parseFace(test.Items, &dummyObject)
 
 			failed := false
 			failed = failed || !compareErrors(err, test.Error)

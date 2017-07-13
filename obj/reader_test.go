@@ -33,11 +33,11 @@ type opts []ReaderOption
 
 var none = []ReaderOption{}
 
-func customType(o *Object, token string, r ...[]byte) error {
+func customType(o *Object, token string, r ...string) error {
 	if len(r) != 1 {
 		return errors.Errorf("got %d parameters, needed %d", len(r), 1)
 	}
-	itemStr := string(r[0])
+	itemStr := r[0]
 	item, err := strconv.ParseInt(itemStr, 10, 64)
 	if err != nil {
 		return errors.Wrapf(err, "error parsing item 1 (%s)", itemStr)
@@ -97,7 +97,7 @@ func TestReadLine(t *testing.T) {
 
 			r := NewReader(nil, test.ReaderOptions...).(*stdReader)
 
-			err := r.readLine([]byte(test.Line), 0, &o)
+			err := r.readLine(test.Line, 0, &o)
 			failed := false
 
 			if err == nil && test.Error != "" {

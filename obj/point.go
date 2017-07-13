@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
+	"strings"
 )
 
 // A Point is a single point on a face
@@ -13,30 +14,30 @@ type Point struct {
 	Texture *TextureCoord
 }
 
-func parsePoint(i []byte, o *Object) (p *Point, err error) {
+func parsePoint(i string, o *Object) (p *Point, err error) {
 	p = &Point{}
 
 	var vertexNormalIndex int64
 	var vertexTextureIndex int64
 	var vertexIndex int64
 
-	vertexItems := splitByToken(i, '/')
+	vertexItems := strings.Split(i, "/")
 
-	if vertexIndex, err = strconv.ParseInt(string(vertexItems[0]), 10, 64); err != nil {
+	if vertexIndex, err = strconv.ParseInt(vertexItems[0], 10, 64); err != nil {
 		return
 	}
 
 	p.Vertex = &o.Vertices[vertexIndex-1]
 
 	if len(vertexItems) > 1 && len(vertexItems[1]) != 0 {
-		if vertexTextureIndex, err = strconv.ParseInt(string(vertexItems[1]), 10, 64); err != nil {
+		if vertexTextureIndex, err = strconv.ParseInt(vertexItems[1], 10, 64); err != nil {
 			return
 		}
 		p.Texture = &o.Textures[vertexTextureIndex-1]
 	}
 
 	if len(vertexItems) > 2 && len(vertexItems[2]) != 0 {
-		if vertexNormalIndex, err = strconv.ParseInt(string(vertexItems[2]), 10, 64); err != nil {
+		if vertexNormalIndex, err = strconv.ParseInt(vertexItems[2], 10, 64); err != nil {
 			return
 		}
 		p.Normal = &o.Normals[vertexNormalIndex-1]

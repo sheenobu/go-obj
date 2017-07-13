@@ -28,7 +28,7 @@ func TestReadVertex(t *testing.T) {
 		name := fmt.Sprintf("parseVertex(%v)", test.Items)
 		t.Run(name, func(t *testing.T) {
 
-			v, err := parseVertex(test.Items.ToByteList())
+			v, err := parseVertex(test.Items)
 
 			failed := false
 			failed = failed || (test.Error == "" && err != nil)

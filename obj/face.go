@@ -8,7 +8,7 @@ type Face struct {
 	Points []*Point
 }
 
-func parseFace(items [][]byte, o *Object) (f Face, err error) {
+func parseFace(items []string, o *Object) (f Face, err error) {
 	var p *Point
 
 	for _, i := range items {

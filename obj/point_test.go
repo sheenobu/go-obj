@@ -30,7 +30,7 @@ func TestReadPoint(t *testing.T) {
 	for _, test := range pointReadTests {
 		name := fmt.Sprintf("parsePoint(%s)", test.Items)
 		t.Run(name, func(t *testing.T) {
-			p, err := parsePoint([]byte(test.Items), &dummyObject)
+			p, err := parsePoint(test.Items, &dummyObject)
 
 			failed := false
 			failed = failed || !compareErrors(err, test.Error)

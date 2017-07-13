@@ -15,7 +15,7 @@ type Normal struct {
 	Z     float64
 }
 
-func parseNormal(items [][]byte) (n Normal, err error) {
+func parseNormal(items []string) (n Normal, err error) {
 	if len(items) != 3 {
 		err = errors.New("item length is incorrect")
 		return
@@ -23,15 +23,15 @@ func parseNormal(items [][]byte) (n Normal, err error) {
 
 	//TODO: check all, merge error types
 
-	if n.X, err = strconv.ParseFloat(string(items[0]), 64); err != nil {
+	if n.X, err = strconv.ParseFloat(items[0], 64); err != nil {
 		err = errors.New("unable to parse X coordinate")
 		return
 	}
-	if n.Y, err = strconv.ParseFloat(string(items[1]), 64); err != nil {
+	if n.Y, err = strconv.ParseFloat(items[1], 64); err != nil {
 		err = errors.New("unable to parse Y coordinate")
 		return
 	}
-	if n.Z, err = strconv.ParseFloat(string(items[2]), 64); err != nil {
+	if n.Z, err = strconv.ParseFloat(items[2], 64); err != nil {
 		err = errors.New("unable to parse Z coordinate")
 		return
 	}

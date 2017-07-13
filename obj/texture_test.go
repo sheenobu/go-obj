@@ -28,7 +28,7 @@ func TestReadTexture(t *testing.T) {
 	for _, test := range textureReadTests {
 		name := fmt.Sprintf("parseTextCoord(%s)", test.Items)
 		t.Run(name, func(t *testing.T) {
-			n, err := parseTextCoord(test.Items.ToByteList())
+			n, err := parseTextCoord(test.Items)
 
 			failed := false
 			failed = failed || !compareErrors(err, test.Error)

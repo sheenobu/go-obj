@@ -15,23 +15,23 @@ type TextureCoord struct {
 	W     float64
 }
 
-func parseTextCoord(items [][]byte) (vt TextureCoord, err error) {
+func parseTextCoord(items []string) (vt TextureCoord, err error) {
 	if len(items) < 2 {
 		err = errors.New("item length is incorrect")
 		return
 	}
 
 	//TODO: merge errors together, check all fields
-	if vt.U, err = strconv.ParseFloat(string(items[0]), 64); err != nil {
+	if vt.U, err = strconv.ParseFloat(items[0], 64); err != nil {
 		err = errors.New("unable to parse U coordinate")
 		return
 	}
-	if vt.V, err = strconv.ParseFloat(string(items[1]), 64); err != nil {
+	if vt.V, err = strconv.ParseFloat(items[1], 64); err != nil {
 		err = errors.New("unable to parse V coordinate")
 		return
 	}
 	if len(items) == 3 {
-		if vt.W, err = strconv.ParseFloat(string(items[2]), 64); err != nil {
+		if vt.W, err = strconv.ParseFloat(items[2], 64); err != nil {
 			err = errors.New("unable to parse W coordinate")
 			return
 		}

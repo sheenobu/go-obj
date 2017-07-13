@@ -28,7 +28,7 @@ func TestReadNormal(t *testing.T) {
 
 		name := fmt.Sprintf("parseNormal(%s)", test.Items)
 		t.Run(name, func(t *testing.T) {
-			n, err := parseNormal(test.Items.ToByteList())
+			n, err := parseNormal(test.Items)
 
 			failed := false
 			failed = failed || test.Error == "" && err != nil
