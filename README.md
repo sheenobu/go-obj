@@ -19,7 +19,7 @@ Simply `go get github.com/sheenobu/go-obj/obj`.
 
 Much of the code outside of `go-obj/obj`
 relies on SDL2 and vendored code but `go-obj/obj` should
-be generic and never fail to pull due to Cgo dependencies (#5).
+be generic and never fail to pull due to Cgo dependencies #5.
 
 ## cmd/obj-renderer
 
