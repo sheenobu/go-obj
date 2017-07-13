@@ -14,6 +14,21 @@ type Point struct {
 	Texture *TextureCoord
 }
 
+func parseIndex(i string, length int) (idx int64, err error) {
+	idx, err = strconv.ParseInt(i, 10, 64)
+	if err != nil {
+		return
+	}
+	if idx < 0 {
+		// Negative indices are relative to the end
+		idx = int64(length) + idx
+	} else {
+		// Positive indices start at 1
+		idx = idx - 1
+	}
+	return
+}
+
 func parsePoint(i string, o *Object) (p *Point, err error) {
 	p = &Point{}
 
@@ -23,24 +38,24 @@ func parsePoint(i string, o *Object) (p *Point, err error) {
 
 	vertexItems := strings.Split(i, "/")
 
-	if vertexIndex, err = strconv.ParseInt(vertexItems[0], 10, 64); err != nil {
+	if vertexIndex, err = parseIndex(vertexItems[0], len(o.Vertices)); err != nil {
 		return
 	}
 
-	p.Vertex = &o.Vertices[vertexIndex-1]
+	p.Vertex = &o.Vertices[vertexIndex]
 
 	if len(vertexItems) > 1 && len(vertexItems[1]) != 0 {
-		if vertexTextureIndex, err = strconv.ParseInt(vertexItems[1], 10, 64); err != nil {
+		if vertexTextureIndex, err = parseIndex(vertexItems[1], len(o.Textures)); err != nil {
 			return
 		}
-		p.Texture = &o.Textures[vertexTextureIndex-1]
+		p.Texture = &o.Textures[vertexTextureIndex]
 	}
 
 	if len(vertexItems) > 2 && len(vertexItems[2]) != 0 {
-		if vertexNormalIndex, err = strconv.ParseInt(vertexItems[2], 10, 64); err != nil {
+		if vertexNormalIndex, err = parseIndex(vertexItems[2], len(o.Normals)); err != nil {
 			return
 		}
-		p.Normal = &o.Normals[vertexNormalIndex-1]
+		p.Normal = &o.Normals[vertexNormalIndex]
 	}
 
 	return

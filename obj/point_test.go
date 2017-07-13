@@ -15,6 +15,7 @@ var pointReadTests = []struct {
 	{"1//2" /*--*/, "" /*----------*/, Point{&Vertex{1, 9, 9, 9}, &Normal{2, 1, 3, 4}, nil}},
 	{"1/3" /*---*/, "" /*----------*/, Point{&Vertex{1, 9, 9, 9}, nil, &TextureCoord{3, 9, 1, 2}}},
 	{"1" /*-----*/, "" /*----------*/, Point{&Vertex{1, 9, 9, 9}, nil, nil}},
+	{"-2/-2/-4" /*-*/, "" /*----------*/, Point{&Vertex{1, 9, 9, 9}, &Normal{2, 1, 3, 4}, &TextureCoord{3, 9, 1, 2}}},
 }
 
 func TestReadPoint(t *testing.T) {
