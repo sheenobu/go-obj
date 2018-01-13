@@ -49,15 +49,16 @@ func (r *stdReader) Read() (*Object, error) {
 	lineNumber := int64(1)
 	for {
 		line, err := buf.ReadBytes('\n')
-		if err == io.EOF {
-			return &o, nil
-		}
+
 		if err != nil && err != io.EOF {
 			return nil, err
 		}
 
 		if err := r.readLine(string(line), lineNumber, &o); err != nil {
 			return nil, err
+		}
+		if err == io.EOF {
+			return &o, nil
 		}
 
 		lineNumber++
